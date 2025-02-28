@@ -1,35 +1,18 @@
 import express from "express";
-import Task from "../models/Task.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
+import {
+  getAllTasks,
+  getTaskById,
+  createTask,
+  updateTask,
+  deleteTask,
+} from "../controllers/taskController.js"; // Corrected the import path
 
-const router = express.Router();
+const taskRouter = express.Router();
+taskRouter.route("/").get(getAllTasks).post(createTask);
+taskRouter
+  .route("/:projectId")
+  .get(getTaskById)
+  .put(updateTask)
+  .delete(deleteTask);
 
-router.post("/create", authMiddleware, async (req, res) => {
-  const { title, description, project, assignedTo, deadline } = req.body;
-  try {
-    const task = new Task({
-      title,
-      description,
-      project,
-      assignedTo,
-      deadline,
-    });
-    await task.save();
-    res.status(201).json(task);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/:projectId", authMiddleware, async (req, res) => {
-  try {
-    const tasks = await Task.find({ project: req.params.projectId }).populate(
-      "assignedTo"
-    );
-    res.json(tasks);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-export default router;
+export default taskRouter;
