@@ -2,8 +2,28 @@ import Task from "../models/Task.js";
 
 export const getAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.find().populate("assignedTo");
-    res.json(tasks);
+    const queryObj = { ...req.query };
+    const excludedFields = ["page", "sort", "limit", "fields"];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    let query = Task.find(queryObj).populate("assignedTo");
+
+    // Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-createdAt");
+    }
+
+    const tasks = await query;
+    res.status(200).json({
+      status: "success",
+      results: tasks.length,
+      data: {
+        tasks,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -14,7 +34,12 @@ export const getTaskById = async (req, res) => {
     const tasks = await Task.find({ project: req.params.projectId }).populate(
       "assignedTo"
     );
-    res.json(tasks);
+    res.json({
+      status: "success",
+      data: {
+        tasks,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -31,7 +56,12 @@ export const createTask = async (req, res) => {
       deadline,
     });
     await task.save();
-    res.status(201).json(task);
+    res.status(201).json({
+      status: "success",
+      data: {
+        task,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -48,7 +78,12 @@ export const updateTask = async (req, res) => {
     if (!task) {
       return res.status(404).json({ error: "Task not found" });
     }
-    res.json(task);
+    res.json({
+      status: "success",
+      data: {
+        task,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

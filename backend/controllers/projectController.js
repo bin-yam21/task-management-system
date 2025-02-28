@@ -2,8 +2,28 @@ import Project from "../models/Project.js";
 
 export const getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find().populate("team");
-    res.json(projects);
+    const queryObj = { ...req.query };
+    const excludedFields = ["page", "limit", "sort", "fields"];
+    excludedFields.forEach((field) => delete queryObj[field]);
+
+    let query = Project.find(queryObj).populate("team");
+
+    // Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-createdAt");
+    }
+
+    const projects = await query;
+    res.json({
+      status: "success",
+      results: projects.length,
+      data: {
+        projects,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -19,7 +39,12 @@ export const createProject = async (req, res) => {
       team,
     });
     await project.save();
-    res.status(201).json(project);
+    res.status(201).json({
+      status: "success",
+      data: {
+        project,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -31,7 +56,12 @@ export const getProjectById = async (req, res) => {
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
-    res.json(project);
+    res.json({
+      status: "success",
+      data: {
+        project,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -48,7 +78,12 @@ export const updateProject = async (req, res) => {
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
-    res.json(project);
+    res.json({
+      status: "success",
+      data: {
+        project,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
