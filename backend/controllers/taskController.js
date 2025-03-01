@@ -45,7 +45,14 @@ export const assignTask = catchAsync(async (req, res) => {
 
   await notification.save();
 
-  res.status(200).json({ message: "Task assigned and notification sent" });
+  res.status(200).json({
+    status: "success",
+    message: "Task assigned and notification sent",
+    data: {
+      task,
+      notification,
+    },
+  });
 });
 
 export const getTaskById = catchAsync(async (req, res) => {
