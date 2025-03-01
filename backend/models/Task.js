@@ -22,7 +22,10 @@ const taskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  // ...additional fields as needed...
+  project: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Project",
+  },
 });
 
 const Task = mongoose.model("Task", taskSchema);

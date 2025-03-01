@@ -1,34 +1,27 @@
 import User from "../models/User.js";
+import catchAsync from "../utils/catchAsync.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-export const registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword, role });
-    await newUser.save();
-    res.status(201).json({ message: "User created successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+export const registerUser = catchAsync(async (req, res) => {
+  const { name, email, password, passwordConfirm, role } = req.body;
+  const newUser = new User({ name, email, password, passwordConfirm, role });
+  await newUser.save();
+  res.status(201).json({ message: "User created successfully" });
+});
 
-export const loginUser = async (req, res) => {
+export const loginUser = catchAsync(async (req, res) => {
   const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found" });
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ message: "User not found" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-    res.json({ token, user });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+  res.json({ token, user });
+});

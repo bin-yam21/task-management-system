@@ -22,13 +22,13 @@ const projectSchema = new mongoose.Schema({
     enum: ["not started", "in progress", "completed"],
     default: "not started",
   },
-  tasks: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Task",
-    },
-  ],
   // ...additional fields as needed...
+});
+
+projectSchema.virtual("tasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "project",
 });
 
 const Project = mongoose.model("Project", projectSchema);

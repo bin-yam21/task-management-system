@@ -5,10 +5,13 @@ import {
   createTask,
   updateTask,
   deleteTask,
-} from "../controllers/taskController.js"; // Corrected the import path
+  assignTask,
+} from "../controllers/taskController.js";
 
 const taskRouter = express.Router();
+
 taskRouter.route("/").get(getAllTasks).post(createTask);
+taskRouter.route("/assign").post(assignTask);
 taskRouter
   .route("/:projectId")
   .get(getTaskById)

@@ -6,8 +6,12 @@ import {
   updateProject,
   deleteProject,
 } from "../controllers/projectController.js";
-// import { authMiddleware } from "../middlewares/authMiddleware.js";
+import authMiddleware from "../middleware/authMiddleware.js";
+
 const projectRouter = express.Router();
+
+projectRouter.use(authMiddleware);
+
 projectRouter.route("/").get(getAllProjects).post(createProject);
 projectRouter
   .route("/:id")
@@ -15,5 +19,4 @@ projectRouter
   .put(updateProject)
   .delete(deleteProject);
 
-//check the auth middleware
 export default projectRouter;

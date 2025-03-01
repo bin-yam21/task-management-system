@@ -6,6 +6,7 @@ import cors from "cors";
 import userRouter from "./routes/userRoutes.js";
 import projectRouter from "./routes/projectRoutes.js";
 import taskRouter from "./routes/taskRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
 
@@ -17,5 +18,6 @@ app.use(cors());
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/tasks", taskRouter);
+app.use("/api/v1/notifications", notificationRoutes);
 
 export default app;
