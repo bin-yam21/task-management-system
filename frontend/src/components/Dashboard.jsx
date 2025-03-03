@@ -1,37 +1,34 @@
 import { useState, useEffect } from "react";
 import api from "../api";
-import NewTaskForm from "./NewTaskForm";
+import NotificationBar from "./NotificationBar";
 
 const Dashboard = () => {
-  const [tasks, setTasks] = useState([]);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await api.get("/api/v1/tasks");
-        setTasks(response.data.data.tasks); // Ensure this matches the API response structure
-      } catch (err) {
-        console.error("Error fetching tasks", err);
-      }
-    };
-    fetchTasks();
+    // Get user role from localStorage
+    const role = localStorage.getItem("userRole");
+    setUserRole(role);
   }, []);
 
   return (
     <div className="p-4">
+      <NotificationBar />
       <h2 className="text-xl font-bold mb-4">Dashboard</h2>
-      <div>
-        <h3 className="text-lg">Your Tasks</h3>
-        <ul>
-          {tasks.map((task) => (
-            <li key={task._id} className="border p-2 mb-2">
-              <h4>{task.title}</h4>
-              <p>{task.description}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <NewTaskForm onTaskCreated={(newTask) => setTasks([...tasks, newTask])} />
+
+      {userRole === "admin" || userRole === "manager" ? (
+        // UI for Admin/Manager
+        <div>
+          <h3 className="text-lg font-semibold">Admin/Manager Panel</h3>
+          <p>Welcome to the admin/manager dashboard.</p>
+        </div>
+      ) : (
+        // UI for Members
+        <div>
+          <h3 className="text-lg font-semibold">Your Dashboard</h3>
+          <p>Welcome to your dashboard.</p>
+        </div>
+      )}
     </div>
   );
 };
